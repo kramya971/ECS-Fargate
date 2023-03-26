@@ -34,7 +34,7 @@ jobs:
 
       - name: Deploy EC2 instance
         run: |
-          terraform destroy \
+          terraform destroy -auto-approve #\
 #            -var="instance_type=t2.micro" \
 #            -var="ami=ami-0735c191cf914754d" \
-            -auto-approve
+#            -auto-approve
