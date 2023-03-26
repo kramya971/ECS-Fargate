@@ -3,7 +3,7 @@ name: Terraform EC2 Deploy with S3 Backend
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   terraform:
