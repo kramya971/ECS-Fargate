@@ -62,7 +62,7 @@ resource "aws_security_group" "my_sg" {
 terraform {
   backend "s3" {
     bucket = "ram-tes"
-    key    = "path/key"
+    #key    = "path/key"
     region = "us-west-2"
   }
 }
