@@ -29,6 +29,7 @@ resource "aws_instance" "my_instance" {
   instance_type = var.instance_type
   vpc_security_group_ids = [aws_security_group.my_sg.id]
   subnet_id     = aws_subnet.my_subnet.id
+  availability_zone = "us-west-2a"
 
   tags = {
     Name = "My EC2 Instance"
