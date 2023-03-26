@@ -1,6 +1,6 @@
 # Provider block to specify AWS as the provider
 provider "aws" {
-  region = "us-west-2"
+  region = "us-west-2a"
 }
 
 # Create VPC and subnet
