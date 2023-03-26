@@ -15,8 +15,8 @@ resource "aws_subnet" "my_subnet" {
 
 # Create EC2 instance
 resource "aws_instance" "my_instance" {
-  ami           = "ami-0735c191cf914754d"
-  instance_type = "t2.micro"
+  ami           = var.ami
+  instance_type = var.instance_type
   vpc_security_group_ids = [aws_security_group.my_sg.id]
   subnet_id     = aws_subnet.my_subnet.id
 
@@ -47,4 +47,14 @@ resource "aws_security_group" "my_sg" {
   tags = {
     Name = "My Security Group"
   }
+}
+
+
+variable "instance_type" {
+  type = string
+}
+
+
+variable "ami" {
+  type = string
 }
