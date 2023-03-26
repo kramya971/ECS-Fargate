@@ -1,0 +1,40 @@
+name: Terraform EC2 Deploy with S3 Backend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+
+      - name: Install Terraform
+        run: |
+          wget https://releases.hashicorp.com/terraform/1.0.11/terraform_1.0.11_linux_amd64.zip
+          unzip terraform_1.0.11_linux_amd64.zip
+          sudo mv terraform /usr/local/bin/
+
+      - name: Initialize Terraform
+        run: |
+          terraform init \
+            -backend-config="bucket=ram-tes" \
+            -backend-config="key=terra.tfstate" \
+            -backend-config="region=us-west-2"
+
+      - name: Deploy EC2 instance
+        run: |
+          terraform apply \
+            -var="instance_type=t2.micro" \
+            -var="ami=ami-0735c191cf914754d" \
+            -auto-approve
