@@ -10,7 +10,7 @@ terraform {
 
 # Configure the AWS Provider
 provider "aws" {
-  region = "us-west-2"
+  region = "us-west-2a"
 }
 
 # Create VPC and subnet
@@ -64,7 +64,7 @@ terraform {
   backend "s3" {
     bucket = "ram-tes"
     #key    = "path/key"
-    region = "us-west-2"
+    region = "us-west-2a"
   }
 }
 
