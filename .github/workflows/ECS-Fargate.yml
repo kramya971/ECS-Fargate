@@ -36,7 +36,7 @@ jobs:
       run: |
         terraform init \
           -backend-config="bucket=ram-tes" \
-          -backend-config="key=terra.tfstate" \
+          -backend-config="key=ecs.tfstate" \
           -backend-config="region=us-west-2"
           
     - name: Plan Terraform
