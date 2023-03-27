@@ -4,6 +4,7 @@ terraform {
     aws = {
       source  = "hashicorp/aws"
       version = "4.60.0"
+      disable_ec2_metadata = "true"
     }
   }
 }
