@@ -33,8 +33,12 @@ jobs:
         terraform_version: 1.4.0
 
     - name: Initialize Terraform
-      run: terraform init
-
+      run: |
+        terraform init \
+          -backend-config="bucket=ram-tes" \
+          -backend-config="key=terra.tfstate" \
+          -backend-config="region=us-west-2"
+          
     - name: Plan Terraform
       id: plan
       run: |
