@@ -1,10 +1,10 @@
 # Provider block to specify AWS as the provider
 terraform {
   required_providers {
-     aws = {
-       source  = "hashicorp/aws"
-       version = "~> 1.0.4"
-     }
+    aws = {
+      source = "hashicorp/aws"
+      version = "4.60.0"
+    }
   }
 }
 
