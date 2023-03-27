@@ -123,3 +123,8 @@ resource "aws_ecs_service" "my_service" {
     security_groups  = [aws_security_group.alb_sg.id]
   }
 }
+
+
+variable "image_tag" {
+  type = string
+}
