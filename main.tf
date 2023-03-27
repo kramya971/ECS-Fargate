@@ -11,9 +11,8 @@ terraform {
 # Configure the AWS Provider
 provider "aws" {
   region = "us-west-2"
-  assume_role {
-    role_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
-  }
+  access_key = ""
+  secret_key = ""
 }
 
 terraform {
