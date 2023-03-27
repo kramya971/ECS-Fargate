@@ -16,6 +16,14 @@ provider "aws" {
   }
 }
 
+terraform {
+  backend "s3" {
+    bucket = "ram-tes"
+    #key    = "path/key"
+    region = "us-west-2"
+  }
+}
+
 
 # Create a VPC for the ECS cluster
 resource "aws_vpc" "ecs_vpc" {
