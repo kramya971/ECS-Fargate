@@ -19,7 +19,7 @@ provider "aws" {
 terraform {
   backend "s3" {
     bucket = "ram-tes"
-    key    = "path/key"
+    key    = "path/ecs.tfstate"
     region = "us-west-2"
   }
 }
