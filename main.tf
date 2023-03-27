@@ -3,7 +3,7 @@ terraform {
   required_providers {
      aws = {
        source  = "hashicorp/aws"
-       version = "~> 4.60.0"
+       version = "~> 1.0.4"
      }
   }
 }
@@ -12,6 +12,7 @@ terraform {
 provider "aws" {
   region = "us-west-2"
 }
+
 
 # Create a VPC for the ECS cluster
 resource "aws_vpc" "ecs_vpc" {
