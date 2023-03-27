@@ -13,67 +13,113 @@ provider "aws" {
   region = "us-west-2"
 }
 
-# Create VPC and subnet
-resource "aws_vpc" "my_vpc" {
+# Create a VPC for the ECS cluster
+resource "aws_vpc" "ecs_vpc" {
   cidr_block = "10.0.0.0/16"
 }
 
-resource "aws_subnet" "my_subnet" {
-  vpc_id     = aws_vpc.my_vpc.id
+# Create subnets for the ECS cluster
+resource "aws_subnet" "ecs_subnet_1" {
+  vpc_id = aws_vpc.ecs_vpc.id
   cidr_block = "10.0.1.0/24"
 }
 
-# Create EC2 instance
-resource "aws_instance" "my_instance" {
-  ami           = var.ami
-  instance_type = var.instance_type
-  vpc_security_group_ids = [aws_security_group.my_sg.id]
-  subnet_id     = aws_subnet.my_subnet.id
-  availability_zone = "us-west-2a"
-
-  tags = {
-    Name = "My EC2 Instance"
-  }
+resource "aws_subnet" "ecs_subnet_2" {
+  vpc_id = aws_vpc.ecs_vpc.id
+  cidr_block = "10.0.2.0/24"
 }
 
-# Create Security Group for EC2 instance
-resource "aws_security_group" "my_sg" {
-  name_prefix = "my_sg_"
-  vpc_id      = aws_vpc.my_vpc.id
+# Create an internet gateway for the ECS cluster
+resource "aws_internet_gateway" "ecs_igw" {
+  vpc_id = aws_vpc.ecs_vpc.id
+}
+
+# Attach the internet gateway to the VPC
+resource "aws_vpc_attachment" "ecs_igw_attachment" {
+  vpc_id = aws_vpc.ecs_vpc.id
+  internet_gateway_id = aws_internet_gateway.ecs_igw.id
+}
+
+# Create a security group for the ALB
+resource "aws_security_group" "alb_sg" {
+  name_prefix = "alb_sg"
+  vpc_id = aws_vpc.ecs_vpc.id
 
   ingress {
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
+    from_port = 3000
+    to_port = 3000
+    protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
 
-  egress {
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+# Create an ALB and a listener
+resource "aws_lb" "ecs_alb" {
+  name = "ecs-alb"
+  load_balancer_type = "application"
+  subnets = [aws_subnet.ecs_subnet_1.id, aws_subnet.ecs_subnet_2.id]
+  security_groups = [aws_security_group.alb_sg.id]
+}
 
-  tags = {
-    Name = "My Security Group"
+resource "aws_lb_listener" "ecs_listener" {
+  load_balancer_arn = aws_lb.ecs_alb.arn
+  port = 3000
+  protocol = "tcp"
+  default_action {
+    type = "forward"
+    target_group_arn = aws_lb_target_group.ecs_target_group.arn
   }
 }
 
-terraform {
-  backend "s3" {
-    bucket = "ram-tes"
-    #key    = "path/key"
-    region = "us-west-2a"
+# Create a target group for the ECS service
+resource "aws_lb_target_group" "ecs_target_group" {
+  name = "ecs-target-group"
+  port = 3000
+  protocol = "tcp"
+  vpc_id = aws_vpc.ecs_vpc.id
+  health_check {
+    path = "/"
+    interval = 30
+    timeout = 10
+    healthy_threshold = 3
+    unhealthy_threshold = 3
+    matcher = "200-299"
   }
 }
 
-
-variable "instance_type" {
-  type = string
+# Create the ECS cluster and Fargate task definition
+resource "aws_ecs_cluster" "ecs_cluster" {
+  name = "my-ecs-cluster"
 }
 
+resource "aws_ecs_task_definition" "my_task_definition" {
+  family = "my-task-definition"
+  network_mode = "awsvpc"
 
-variable "ami" {
-  type = string
+  container_definitions = jsonencode([
+    {
+      name = "my-container"
+      image = "my-image"
+      portMappings = [
+        {
+          containerPort = 3000
+          protocol = "tcp"
+        }
+      ]
+    }
+  ])
+}
+
+# Create an ECS service
+resource "aws_ecs_service" "my_service" {
+  name            = "my-service"
+  cluster         = aws_ecs_cluster.ecs_cluster.id
+  task_definition = aws_ecs_task_definition.my_task_definition.arn
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    assign_public_ip = true
+    subnets          = ["aws_subnet.ecs_subnet_1.id", "aws_subnet.ecs_subnet_2.id"]
+    security_groups  = [aws_security_group.alb_sg.id]
+  }
 }
