@@ -154,6 +154,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_attachment" {
   role       = aws_iam_role.ecs_task_execution_role.name
 }
 
+#variables
 variable "image_tag" {
   type = string
 }
