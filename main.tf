@@ -10,7 +10,6 @@ terraform {
 # Configure the AWS Provider
 provider "aws" {
   region = "us-west-2"
-  disable_ec2_metadata = "true"
 }
 
 # Create a VPC for the ECS cluster
